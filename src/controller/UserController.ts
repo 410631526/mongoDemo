@@ -24,9 +24,16 @@ export class UserController extends Contorller {
 
         const dbResp = await this.service.getAllStudents();
         if (dbResp) {
-            res.body = dbResp;
-            res.message = "find sucess";
-            Response.send(res);
+            // 用來找問題加入的程式碼
+            if (dbResp.length == 0) {
+                res.body = dbResp;
+                res.message = "no data";
+                Response.send(res);
+            } else {
+                res.body = dbResp;
+                res.message = "find sucess";
+                Response.send(res);
+            }
         } else {
             res.code = 500;
             res.message = "server error";
@@ -40,5 +47,23 @@ export class UserController extends Contorller {
         Response.status(resp.code).send(resp)
     }
 
-
+    public async deleteByUserName(Request: Request, Response: Response) {
+        const userName = Request.body.userName || Request.query.userName;
+        if (!userName) {
+            return Response.status(400).send({ code: 400, message: "用戶名是必需的" });
+        }
+        const resp = await this.service.deleteByUserName(userName);
+        Response.status(resp.code).send(resp);
+    }
+    
+    public async updateNameByUserName(Request: Request, Response: Response) {
+        const { userName, name } = Request.body;
+        if (!userName || !name) {
+            return Response.status(400).send({ message: 'userName 和 name 是必需的參數' });
+        }
+    
+        const resp = await this.service.updateNameByUserName(userName, name);
+        Response.status(resp.code).send(resp);
+    }    
+    
 }
